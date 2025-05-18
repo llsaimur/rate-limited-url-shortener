@@ -111,9 +111,9 @@ dotnet run
 ## 🚧 Work in Progress / To-Do
 
 ### Backend
-- [✔️] Dynamic rate limits per `ApiClient`
-- [✔️] API key generation & rotation endpoints
-- [✔️] Usage analytics API + dashboard
+- [x] Dynamic rate limits per `ApiClient`
+- [x] API key generation & rotation endpoints
+- [x] Usage analytics API + dashboard
 - [ ] Migrate to PostgreSQL
 - [ ] Unit + integration test coverage
 
