@@ -229,6 +229,11 @@ _pkginfo.txt
 # but keep track of directories ending in .cache
 !?*.[Cc]ache/
 
+# ASP.NET Secrets
+secrets.json
+.env
+appsettings.*.local.json
+
 # Others
 ClientBin/
 ~$*

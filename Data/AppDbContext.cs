@@ -11,6 +11,5 @@ namespace UrlShortener.Data
         public DbSet<UrlMapping> UrlMappings { get; set; }
 
         public DbSet<ApiClient> ApiClients { get; set; }
-
     }
 }

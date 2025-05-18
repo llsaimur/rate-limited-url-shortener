@@ -44,5 +44,4 @@ namespace UrlShortener.Controllers
             return Redirect(mapping.OriginalUrl);
         }
     }
-
 }

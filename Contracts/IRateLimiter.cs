@@ -2,7 +2,6 @@
 {
     public interface IRateLimiter
     {
-        bool IsRequestAllowed(string clientId);
+        bool IsRequestAllowed(string clientId, int maxTokens);
     }
-
 }

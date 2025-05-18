@@ -1,5 +1,6 @@
 ﻿using UrlShortener.Contracts;
 using UrlShortener.Data;
+using UrlShortener.Services;
 
 namespace UrlShortener.Middleware
 {
@@ -12,8 +13,14 @@ namespace UrlShortener.Middleware
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, IRateLimiter limiter, AppDbContext db)
+        public async Task InvokeAsync(HttpContext context, IRateLimiter limiter, AppDbContext db, IUsageTracker usageTracker)
         {
+            if (context.Request.Path.StartsWithSegments("/admin"))
+            {
+                await _next(context); // skip rate limiting
+                return;
+            }
+
             if (!context.Request.Headers.TryGetValue("X-Api-Key", out var apiKey))
             {
                 context.Response.StatusCode = 401;
@@ -29,17 +36,18 @@ namespace UrlShortener.Middleware
                 return;
             }
 
-            if (!limiter.IsRequestAllowed(client.ApiKey))
+            usageTracker.IncrementRequest(client.ApiKey); // Track total requests
+
+            if (!limiter.IsRequestAllowed(client.ApiKey, client.RateLimit))
             {
+                usageTracker.IncrementBlocked(client.ApiKey);
+                Console.WriteLine($"Client: {client.Name}, API Key: {client.ApiKey}, Limit: {client.RateLimit}");
                 context.Response.StatusCode = 429;
                 await context.Response.WriteAsync("Rate limit exceeded");
                 return;
             }
-
             // Continue to the next middleware
             await _next(context);
         }
     }
-
-
 }
