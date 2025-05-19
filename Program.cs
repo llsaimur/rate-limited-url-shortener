@@ -5,6 +5,7 @@ using UrlShortener.Middleware;
 using UrlShortener.Services;
 using StackExchange.Redis;
 using UrlShortener.Models;
+using UrlShortener.Helpers;
 
 DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -18,13 +19,14 @@ builder.Configuration
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register DB
+var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 // Register Redis connection
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-    ConnectionMultiplexer.Connect("localhost:6379")); // Or use env/config
+    ConnectionMultiplexer.Connect(builder.Configuration["REDIS_CONNECTION"]));
 
 builder.Services.AddSingleton<IRateLimiter>(sp =>
 {
@@ -33,7 +35,6 @@ builder.Services.AddSingleton<IRateLimiter>(sp =>
 });
 
 builder.Services.AddSingleton<IUsageTracker, RedisUsageTracker>();
-
 
 // Register Controllers
 builder.Services.AddControllers();
@@ -44,6 +45,12 @@ builder.Services.Configure<AdminOptions>(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    DatabaseHelper.SeedInitialData(db);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
