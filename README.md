@@ -182,15 +182,6 @@ X-Api-Key: your-api-key
 
 ---
 
-## 📋 To-Do
-
-- [ ] UI for API key login & management
-- [ ] Rate limit usage indicators in frontend
-- [ ] Swagger auth key input field (optional)
-- [ ] Extend analytics/dashboard support
-
----
-
 ## 🧪 License
 
 This project is licensed under the [MIT License](LICENSE).
