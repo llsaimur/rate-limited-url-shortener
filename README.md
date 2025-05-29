@@ -1,73 +1,133 @@
+# 🔗 Rate-Limited URL Shortener (Full Stack)
 
-# 🔗 Rate-Limited URL Shortener API (Full Stack - WIP)
-
-A modern, full-stack URL shortening service built with **ASP.NET Core** and soon-to-be **Angular** frontend. This project features **distributed rate limiting**, **API key authentication**, and a clean scalable architecture.
+A full-stack URL shortening service with **ASP.NET Core** backend and **Angular** frontend. Includes **Redis-backed rate limiting**, **API key authentication**, and **PostgreSQL** for persistence.
 
 ---
 
-## ✅ Features Implemented (Backend)
+## ✅ Features
 
-- ✔️ URL shortening and redirection via REST API
-- ✔️ Token Bucket **rate limiter** using Redis + Lua scripting
-- ✔️ Per-user **API key** authentication
-- ✔️ **SQLite database** for persistent URL and user storage
-- ✔️ Middleware for rate-limiting and authentication enforcement
-- ✔️ Postman-tested endpoints
-- ✔️ Clean architecture with services, models, and middleware
+- 🔐 API Key authentication per client
+- ⚖️ Token Bucket rate limiting using Redis
+- 🔗 URL shortening and redirection
+- 🧠 PostgreSQL for data persistence
+- 🌐 Angular-based frontend UI
+- 🐳 Docker support for PostgreSQL + Redis
+- 🧱 Clean architecture using services and middleware
 
 ---
 
 ## 🚀 Tech Stack
 
-| Layer     | Stack                               |
-|-----------|--------------------------------------|
-| Backend   | ASP.NET Core 6+, Entity Framework    |
-| Storage   | SQLite (PostgreSQL planned)          |
-| Caching   | Redis (Docker)                       |
-| Rate Limiting | Token Bucket (Lua Script)        |
-| Frontend  | Angular (planned)                    |
-| Testing   | Postman, xUnit (planned)             |
+| Layer         | Technology                        |
+|---------------|------------------------------------|
+| Backend       | ASP.NET Core 6, Entity Framework   |
+| Database      | PostgreSQL (via Docker)            |
+| Cache         | Redis (via Docker)                 |
+| Frontend      | Angular                            |
+| Rate Limiting | Token Bucket (Redis-based)         |
 
 ---
 
-## 📦 Project Structure (Backend)
+## 📂 Project Overview
 
 ```
-UrlShortener/
-├── Controllers/              # API endpoints
-├── Services/                 # Business logic + rate limiting
-├── Middleware/               # Request interception
-├── Data/                     # EF Core DbContext
-├── Models/                   # API + DB models
-├── Program.cs                # Startup config
-└── appsettings.json
+root/
+├── backend/                # ASP.NET Core API
+│   ├── Controllers/
+│   ├── Services/
+│   ├── Middleware/
+│   ├── Data/
+│   ├── Models/
+│   ├── Program.cs
+│   └── appsettings.json
+├── frontend/               # Angular App
+│   ├── src/
+│   └── angular.json
+├── docker-compose.yml
+└── .env
 ```
 
 ---
 
-## 📫 API Usage
+## ⚙️ Setup Instructions
 
-### 🔐 Headers
-```
-X-Api-Key: key123
-```
-
-### 🔗 Endpoints
-
-| Method | URL                     | Description                        |
-|--------|--------------------------|------------------------------------|
-| POST   | /url/shorten            | Shorten a long URL (requires API key) |
-| GET    | /url/{shortCode}        | Redirect to original URL           |
+### 🔧 Prerequisites
+- [.NET SDK 6+](https://dotnet.microsoft.com/download)
+- [Node.js + npm](https://nodejs.org/)
+- [Angular CLI](https://angular.io/cli) — `npm install -g @angular/cli`
+- [Docker](https://www.docker.com/)
 
 ---
 
-## 🧪 Rate Limiting
+### 🔑 1. Configure Environment
 
-Using a **Redis-backed Token Bucket algorithm**, with:
+Create a `.env` file in the root with:
 
-- Max tokens: based on user’s `RateLimit`
-- Refill rate: configurable (currently fixed per plan)
-- TTL and atomicity via Lua scripting
+```
+ADMIN_API_KEY=supersecretadminkey
+DB_CONNECTION=Host=localhost;Port=5432;Database=urls;Username=devuser;Password=devpass
+REDIS_CONNECTION=localhost:6379
+```
+
+---
+
+### 🐳 2. Start PostgreSQL & Redis
+
+From the root folder:
+
+```bash
+docker-compose up -d
+```
+
+---
+
+### 🖥️ 3. Run the Backend
+
+```bash
+cd backend
+dotnet restore
+dotnet run
+```
+
+Backend starts at: `http://localhost:5002`
+
+---
+
+### 🌐 4. Run the Frontend
+
+```bash
+cd frontend
+npm install
+ng serve
+```
+
+Frontend starts at: `http://localhost:4200`
+
+---
+
+## 🔌 API Usage
+
+### 🔐 Header Example
+```http
+X-Api-Key: your-api-key
+```
+
+### 🔗 Key Endpoints
+
+| Method | Endpoint               | Description                          |
+|--------|------------------------|--------------------------------------|
+| POST   | `/url/shorten`         | Shorten a long URL (requires API key)|
+| GET    | `/url/{shortCode}`     | Redirects to the original long URL    |
+
+---
+
+## 📉 Rate Limiting
+
+Implemented via a **Token Bucket algorithm** using Redis:
+
+- Each client has a rate limit (tokens/sec)
+- Requests cost tokens
+- Redis + Lua scripting ensures atomicity and speed
 
 ---
 
@@ -91,42 +151,43 @@ int RateLimit
 
 ---
 
-## 🛠 Setup Instructions
+## 🧪 Usage Instructions
 
-### Prerequisites
-- [.NET SDK 6+](https://dotnet.microsoft.com/download)
-- Redis (run via Docker: `docker run -p 6379:6379 redis`)
-- SQLite or PostgreSQL
+### From the UI (Angular)
+1. Visit `http://localhost:4200`
+2. Paste a URL to shorten
+3. Provide your API key when prompted
+4. Get a short URL with usage feedback
 
-### Run the App
+### From a Tool (e.g. Postman)
+```http
+POST /url/shorten HTTP/1.1
+Host: localhost:5002
+Content-Type: application/json
+X-Api-Key: your-api-key
 
-```bash
-dotnet restore
-dotnet ef database update
-dotnet run
+{
+  "originalUrl": "https://example.com"
+}
 ```
 
 ---
 
-## 🚧 Work in Progress / To-Do
+## 🛠 Development Notes
 
-### Backend
-- [x] Dynamic rate limits per `ApiClient`
-- [x] API key generation & rotation endpoints
-- [x] Usage analytics API + dashboard
-- [ ] Migrate to PostgreSQL
-- [ ] Unit + integration test coverage
-
-### Frontend (Angular)
-- [ ] URL input + shorten interface
-- [ ] API key login UI
-- [ ] Admin dashboard to view usage
-- [ ] Error handling and status UI
+- Admin API key is set via `.env`
+- CORS is enabled for `localhost:4200`
+- Database seeding runs at startup
+- Redis + EF Core are DI-injected
 
 ---
 
-## 🌍 Live Demo / Deployment
-> Coming soon — may use Render, Railway, or Azure App Service.
+## 📋 To-Do
+
+- [ ] UI for API key login & management
+- [ ] Rate limit usage indicators in frontend
+- [ ] Swagger auth key input field (optional)
+- [ ] Extend analytics/dashboard support
 
 ---
 
