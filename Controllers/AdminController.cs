@@ -87,4 +87,27 @@ public class AdminController : ControllerBase
 
         return Ok(stats);
     }
+
+    [HttpDelete("clients/{apiKey}")]
+    public IActionResult DeleteClient(
+    [FromHeader(Name = "X-Admin-Key")] string adminKey,
+    string apiKey)
+    {
+        if (adminKey != _adminOptions.Key)
+        {
+            return Unauthorized("Invalid admin key.");
+        }
+
+        var client = _db.ApiClients.FirstOrDefault(c => c.ApiKey == apiKey);
+        if (client == null)
+        {
+            return NotFound("Client not found.");
+        }
+
+        _db.ApiClients.Remove(client);
+        _db.SaveChanges();
+
+        return NoContent(); // 204 success without body
+    }
+
 }

@@ -1,0 +1,25 @@
+<div class="header">
+  <h1>🔗 ShortGuard</h1>
+  <p>Monitor and manage API access with style.</p>
+</div>
+
+<div class="key-bar">
+  <label>
+    API Key:
+    <input [(ngModel)]="apiKey" (change)="saveKeys()" placeholder="User API Key" />
+  </label>
+  <label>
+    Admin Key:
+    <input [(ngModel)]="adminKey" (change)="saveKeys()" placeholder="Admin API Key" />
+  </label>
+</div>
+
+<nav class="nav-links">
+  <a routerLink="/shorten" routerLinkActive="active">Shorten URL</a>
+  <a routerLink="/admin/stats" routerLinkActive="active">Stats</a>
+  <a routerLink="/admin/clients" routerLinkActive="active">Clients</a>
+</nav>
+
+<main>
+  <router-outlet></router-outlet>
+</main>

@@ -1,0 +1,32 @@
+<h2 class="section-title">📊 Client Stats</h2>
+
+<div *ngIf="isBrowser" class="chart-container">
+  <canvas baseChart
+          [data]="chartData"
+          [options]="chartOptions"
+          chartType="bar">
+  </canvas>
+</div>
+
+<hr class="divider" />
+
+<table class="stats-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>API Key</th>
+      <th>Rate Limit</th>
+      <th>Requests</th>
+      <th>Blocked</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let client of stats">
+      <td>{{ client.name }}</td>
+      <td><code>{{ client.apiKey }}</code></td>
+      <td>{{ client.rateLimit }}</td>
+      <td>{{ client.requests }}</td>
+      <td>{{ client.blocked }}</td>
+    </tr>
+  </tbody>
+</table>

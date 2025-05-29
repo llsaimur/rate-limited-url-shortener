@@ -1,4 +1,5 @@
-﻿using UrlShortener.Contracts;
+﻿using System.IO;
+using UrlShortener.Contracts;
 using UrlShortener.Data;
 using UrlShortener.Services;
 
@@ -15,6 +16,15 @@ namespace UrlShortener.Middleware
 
         public async Task InvokeAsync(HttpContext context, IRateLimiter limiter, AppDbContext db, IUsageTracker usageTracker)
         {
+            //  Allow all GET requests to /url/{code} without API key
+            if (context.Request.Method == "GET" && context.Request.Path.StartsWithSegments("/url", out var remaining) &&
+                remaining.Value?.Trim('/').Length == 6) // assuming 6-char codes
+            {
+                await _next(context); // skip rate limiting
+                return;
+            }
+
+            // Allow /admin/** for now without rate limit
             if (context.Request.Path.StartsWithSegments("/admin"))
             {
                 await _next(context); // skip rate limiting

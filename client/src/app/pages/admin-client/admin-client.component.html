@@ -1,0 +1,40 @@
+<h2 class="admin-title">👥 API Clients</h2>
+
+<!-- Create New Client Form -->
+<form class="client-form" (ngSubmit)="createClient()">
+  <div class="form-group">
+    <label>
+      Name:
+      <input type="text" [(ngModel)]="newClientName" name="name" required />
+    </label>
+
+    <label>
+      Rate Limit:
+      <input type="number" [(ngModel)]="newClientRateLimit" name="rateLimit" required min="1" />
+    </label>
+
+    <button type="submit">Create Client</button>
+  </div>
+</form>
+
+<!-- Client List -->
+<table class="client-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>API Key</th>
+      <th>Rate Limit</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let client of clients">
+      <td>{{ client.name }}</td>
+      <td><code>{{ client.apiKey }}</code></td>
+      <td>{{ client.rateLimit }}</td>
+      <td>
+        <button class="delete-btn" (click)="deleteClient(client.apiKey)">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
